@@ -15,7 +15,7 @@ makeCacheMatrix <- function( theMatrix = matrix()) {
     #getter of the matrix simply returns the matrix
     getTheMatrix <- function() theMatrix
     #setter of inverted matrix is when caching is created
-    setTheMatrixInverted <- function(solve) theMatrix
+    setTheMatrixInverted <- function(solve) theMatrix <<- solve
     #getter of inverted matrix simply returns the inverted matrix
     getTheMatrixInverted <- function() theMatrixInverted
     
