@@ -1,45 +1,67 @@
 ## R Programming assignment 2
 ## Written by Billy Yeh
 
-## This function creates the cached matrix
+## This function leverages the getter/setter programming concept
+## to also be able to create a cached inverse of the matrix passed in
+## Note that this we can only accept a square matrix (same rows and columns)
 makeCacheMatrix <- function( theMatrix = matrix()) {
-    #initialize the inverted matrix we plan on caching to null
-    theMatrixInverted <- NULL
     
-    #setter of the matrix
-    setTheMatrix <- function(theMatrixLocal) {
-        theMatrix <<- theMatrixLocal
-        #when the matrix changes, the cache will be flushed
-        theMatrixInverted <<- NULL
+    # make sure it is a matrix
+    if(!is.matrix(theMatrix)) {
+        message("Please pass in a valid matrix")
+        return
     }
-    #getter of the matrix simply returns the matrix
-    getTheMatrix <- function() theMatrix
-    #setter of inverted matrix is when caching is created
-    setTheMatrixInverted <- function(solve) theMatrix <<- solve
-    #getter of inverted matrix simply returns the inverted matrix
-    getTheMatrixInverted <- function() theMatrixInverted
     
+    theMatrixInv <- NULL
+    
+    # setter of the matrix
+    setTheMatrix <- function(theMatrixLocal) {
+        # whenever matrix is set if it is different from before
+        # then we should re-calculate the inverse
+        theMatrix <<- theMatrixLocal
+        
+        #when the matrix changes, assume we need to solve again
+        theMatrixInv <<- solve(theMatrixLocal)
+    }
+    # getter of the matrix
+    getTheMatrix <- function() theMatrix
+
+    
+    # getter of inverse matrix, no need for a setter of inverse since should be read-only
+    getTheMatrixInv <- function(theMatrixLocal) {
+        
+        theMatrixInv <<- solve(theMatrixLocal)
+    }
+    # return the list of functions
     list (
         setTheMatrix = setTheMatrix, 
         getTheMatrix = getTheMatrix,
-        setTheMatrixInverted = setTheMatrixInverted,
-        getTheMatrixInverted = getTheMatrixInverted
+        getTheMatrixInv = getTheMatrixInv
     )
 }
 
 
-## This function is the main entry point to invert the matrix
+## This function will return the inverse of a square matrix
+## To use this function, first pass a matrix into the function makeCacheMatrix
+## The output of that function is a list of functions to be passed in as the x parameter
 cacheSolve <- function(x, ...) {
     
+    # get the matrix
     theMatrix <- x$getTheMatrix()
+    theMatrixInv <- x$getTheMatrixInv(theMatrix)
     
-    theMatrixInverted <- x$getTheMatrixInverted()
+    # get the inverse
+    if(is.null(theMatrixInv)) {
+        theMatrixInv <<- x$setTheMatrixInv(theMatrix)
+    }
     
-    if(!is.null(theMatrixInverted)) {
-        message("getting cached inverted matrix")
-        return(theMatrixInverted)
+    #if(!is.null(theMatrixInv) && sum(theMatrix %*% theMatrixInv - diag(nrow(theMatrix))) == 0) {
+    if(!is.null(theMatrixInv)) {
+    message("getting cached inverse matrix")
+        return(theMatrixInv)
     } else {
-        NULL
+        message("not getting cached inverse matrix")
+        solve(theMatrix)
     }
     
     
