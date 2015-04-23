@@ -48,21 +48,16 @@ cacheSolve <- function(x, ...) {
     
     # get the matrix
     theMatrix <- x$getTheMatrix()
-    theMatrixInv <- x$getTheMatrixInv(theMatrix)
-    
-    # get the inverse
-    if(is.null(theMatrixInv)) {
-        theMatrixInv <<- x$setTheMatrixInv(theMatrix)
-    }
-    
-    #if(!is.null(theMatrixInv) && sum(theMatrix %*% theMatrixInv - diag(nrow(theMatrix))) == 0) {
+
     if(!is.null(theMatrixInv)) {
-    message("getting cached inverse matrix")
+        message("getting cached inverse matrix")
         return(theMatrixInv)
     } else {
         message("not getting cached inverse matrix")
-        solve(theMatrix)
+        theMatrixInv <- x$getTheMatrixInv(theMatrix)
+        return (theMatrixInv)
     }
     
     
 }
+
