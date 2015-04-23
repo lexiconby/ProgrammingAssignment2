@@ -6,11 +6,6 @@
 ## Note that this we can only accept a square matrix (same rows and columns)
 makeCacheMatrix <- function( theMatrix = matrix()) {
     
-    # make sure it is a matrix
-    if(!is.matrix(theMatrix)) {
-        message("Please pass in a valid matrix")
-        return
-    }
     
     theMatrixInv <- NULL
     
@@ -44,17 +39,19 @@ makeCacheMatrix <- function( theMatrix = matrix()) {
 ## This function will return the inverse of a square matrix
 ## To use this function, first pass a matrix into the function makeCacheMatrix
 ## The output of that function is a list of functions to be passed in as the x parameter
+## The first time you run this function, nothing is cahced yet
+## The second time you run this function, theMatrixInv will be cached
 cacheSolve <- function(x, ...) {
     
     # get the matrix
     theMatrix <- x$getTheMatrix()
 
-    if(!is.null(theMatrixInv)) {
+    if(!is.null(theMatrixInv) & sum(theMatrix %*% theMatrixInv - diag(nrow(theMatrix)))==0) {
         message("getting cached inverse matrix")
         return(theMatrixInv)
     } else {
         message("not getting cached inverse matrix")
-        theMatrixInv <- x$getTheMatrixInv(theMatrix)
+        theMatrixInv <<- x$getTheMatrixInv(theMatrix)
         return (theMatrixInv)
     }
     
