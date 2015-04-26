@@ -3,35 +3,34 @@
 
 ## This function leverages the getter/setter programming concept
 ## to also be able to create a cached inverse of the matrix passed in
-## Note that this we can only accept a square matrix (same rows and columns)
-makeCacheMatrix <- function( theMatrix = matrix()) {
+## Note that this we can only accept an invertable square matrix (same rows and columns)
+makeCacheMatrix <- function( mat = matrix()) {
     
-    
-    theMatrixInv <- NULL
+    # initialize inverse matrix
+    matInv <- NULL
     
     # setter of the matrix
-    setTheMatrix <- function(theMatrixLocal) {
-        # whenever matrix is set if it is different from before
-        # then we should re-calculate the inverse
-        theMatrix <<- theMatrixLocal
-        
-        #when the matrix changes, assume we need to solve again
-        theMatrixInv <<- solve(theMatrixLocal)
+    setMat <- function(mat2) {
+        mat <<- mat2
     }
-    # getter of the matrix
-    getTheMatrix <- function() theMatrix
-
     
-    # getter of inverse matrix, no need for a setter of inverse since should be read-only
-    getTheMatrixInv <- function(theMatrixLocal) {
-        
-        theMatrixInv <<- solve(theMatrixLocal)
+    # getter of the matrix
+    getMat <- function() mat
+
+    # setter for the inverse matrix
+    setMatInv <- function(matInv2) {
+        matInv <<- matInv2
     }
+    
+    #getter for the inverse matrix
+    getMatInv <- function() matInv
+    
     # return the list of functions
     list (
-        setTheMatrix = setTheMatrix, 
-        getTheMatrix = getTheMatrix,
-        getTheMatrixInv = getTheMatrixInv
+        setMat = setMat, 
+        getMat = getMat,
+        setMatInv = setMatInv,
+        getMatInv = getMatInv
     )
 }
 
@@ -43,18 +42,20 @@ makeCacheMatrix <- function( theMatrix = matrix()) {
 ## The second time you run this function, theMatrixInv will be cached
 cacheSolve <- function(x, ...) {
     
-    # get the matrix
-    theMatrix <- x$getTheMatrix()
-
-    if(!is.null(theMatrixInv) & sum(theMatrix %*% theMatrixInv - diag(nrow(theMatrix)))==0) {
+    # get the matrix and inverse
+    mat <- x$getMat()
+    matInv <- x$getMatInv()
+    
+    # check to see if we can use cache
+    if(!is.null(matInv)) {
         message("getting cached inverse matrix")
-        return(theMatrixInv)
+        return(matInv)
     } else {
         message("not getting cached inverse matrix")
-        theMatrixInv <<- x$getTheMatrixInv(theMatrix)
-        return (theMatrixInv)
+        matInv <- solve(mat)
+        x$setMatInv(matInv)
+        return (matInv)
     }
-    
     
 }
 
